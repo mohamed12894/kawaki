@@ -1,112 +1,18 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<title>Kawaki - منتجاتنا</title>
-<style>
-  body { font-family: Arial, sans-serif; direction: rtl; background: #f7f7f7; padding: 20px; }
-  h1 { text-align: center; color: #2c3e50; }
-  .products { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-  .product {
-    background: white; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    width: 220px; padding: 15px; text-align: center;
-  }
-  .product img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
-  .product h3 { margin: 10px 0 5px; }
-  .product p { margin: 5px 0; font-weight: bold; color: #27ae60; }
-  button {
-    background-color: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 4px;
-    cursor: pointer; font-size: 14px;
-  }
-  button:hover {
-    background-color: #219150;
-  }
-  #cartBtn {
-    position: fixed; top: 20px; left: 20px; background: #e67e22; color: white; padding: 10px 20px;
-    border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 16px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المنتجات</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-
-<button id="cartBtn">السلة (0)</button>
-
-<h1>منتجات Kawaki</h1>
-
-<div class="products" id="productsContainer">
-  <!-- المنتجات ستضاف هنا ديناميكياً -->
-</div>
-
-<script>
-// بيانات المنتجات (ممكن تزيدهم أو تغيرهم هنا)
-const products = [
-  { id: 1, name: 'منتج 1', price: 50, img: 'https://via.placeholder.com/220x150?text=منتج+1' },
-  { id: 2, name: 'منتج 2', price: 30, img: 'https://via.placeholder.com/220x150?text=منتج+2' },
-  { id: 3, name: 'منتج 3', price: 70, img: 'https://via.placeholder.com/220x150?text=منتج+3' },
-];
-
-// جلب السلة من localStorage أو انشاؤها إذا فارغة
-function getCart() {
-  const cart = localStorage.getItem('kawakiCart');
-  return cart ? JSON.parse(cart) : [];
-}
-
-// حفظ السلة في localStorage
-function saveCart(cart) {
-  localStorage.setItem('kawakiCart', JSON.stringify(cart));
-}
-
-// تحديث عدد المنتجات في زر السلة
-function updateCartCount() {
-  const cart = getCart();
-  let count = 0;
-  cart.forEach(item => count += item.quantity);
-  document.getElementById('cartBtn').textContent = `السلة (${count})`;
-}
-
-// إضافة منتج للسلة
-function addToCart(productId) {
-  const cart = getCart();
-  const product = products.find(p => p.id === productId);
-  if (!product) return;
-
-  const cartItem = cart.find(item => item.id === productId);
-  if (cartItem) {
-    cartItem.quantity++;
-  } else {
-    cart.push({ id: productId, name: product.name, price: product.price, quantity: 1 });
-  }
-
-  saveCart(cart);
-  updateCartCount();
-  alert(`تم إضافة ${product.name} إلى السلة`);
-}
-
-// عرض المنتجات في الصفحة
-function displayProducts() {
-  const container = document.getElementById('productsContainer');
-  products.forEach(product => {
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.innerHTML = `
-      <img src="${product.img}" alt="${product.name}" />
-      <h3>${product.name}</h3>
-      <p>${product.price} د.ت</p>
-      <button onclick="addToCart(${product.id})">أضف إلى السلة</button>
-    `;
-    container.appendChild(div);
-  });
-}
-
-// زر السلة ينقل لصفحة تأكيد الطلب
-document.getElementById('cartBtn').addEventListener('click', () => {
-  window.location.href = 'confirm.html';
-});
-
-// بدء تشغيل الموقع
-displayProducts();
-updateCartCount();
-</script>
-
+  <header>
+    <h1>منتجات الكريب</h1>
+    <a href="confirm.html" class="top-btn">سلة الشراء</a>
+  </header>
+  <div class="product-grid" id="productGrid"></div>
+  <script src="script.js"></script>
 </body>
 </html>

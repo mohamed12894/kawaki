@@ -1,187 +1,23 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<title>تأكيد الطلب - Kawaki</title>
-<style>
-  body { font-family: Arial, sans-serif; direction: rtl; background: #f7f7f7; padding: 20px; }
-  .container {
-    background: white; padding: 20px; max-width: 600px; margin: auto; border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  h2 { color: #2c3e50; text-align: center; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-  th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-  input[type="number"] {
-    width: 60px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px;
-  }
-  label { display: block; margin-bottom: 5px; }
-  input[type="text"], input[type="tel"] {
-    width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;
-  }
-  button {
-    background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 4px;
-    cursor: pointer; font-size: 16px;
-  }
-  button:hover {
-    background-color: #219150;
-  }
-  a.home-link {
-    display: inline-block; margin-bottom: 15px; color: #27ae60; font-weight: bold;
-    text-decoration: none; font-size: 16px;
-  }
-  a.home-link:hover {
-    text-decoration: underline;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تأكيد الطلب</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="container">
-  <a href="index.html" class="home-link">🏠 Home</a>
-
-  <h2>سلة المشتريات وتأكيد الطلب</h2>
-
-  <table id="cartTable">
-    <thead>
-      <tr>
-        <th>المنتج</th>
-        <th>السعر (د.ت)</th>
-        <th>الكمية</th>
-        <th>المجموع</th>
-        <th>حذف</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- هنا توضع المنتجات المضافة -->
-    </tbody>
-  </table>
-
-  <h3>المجموع الكلي: <span id="totalPrice">0</span> د.ت</h3>
-
-  <h3>بيانات العميل</h3>
-  <form id="orderForm">
-    <label>الاسم:</label>
-    <input type="text" name="name" required />
-    <label>الهاتف:</label>
-    <input type="tel" name="phone" required />
-    <label>العنوان:</label>
-    <input type="text" name="address" required />
-
-    <input type="hidden" name="paymentMethod" value="الدفع عند الاستلام" />
-
-    <button type="submit">أرسل الطلب</button>
-  </form>
-</div>
-
-<script>
-// جلب السلة من localStorage
-function getCart() {
-  const cart = localStorage.getItem('kawakiCart');
-  return cart ? JSON.parse(cart) : [];
-}
-
-// حفظ السلة في localStorage
-function saveCart(cart) {
-  localStorage.setItem('kawakiCart', JSON.stringify(cart));
-}
-
-// تحديث عرض السلة في الجدول وحساب المجموع
-function displayCart() {
-  const cart = getCart();
-  const tbody = document.querySelector('#cartTable tbody');
-  tbody.innerHTML = '';
-
-  let total = 0;
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.quantity;
-    total += itemTotal;
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${item.name}</td>
-      <td>${item.price}</td>
-      <td><input type="number" min="1" value="${item.quantity}" data-index="${index}" class="qtyInput" /></td>
-      <td>${itemTotal}</td>
-      <td><button data-index="${index}" class="deleteBtn">حذف</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById('totalPrice').textContent = total;
-  return total;
-}
-
-// تحديث الكمية عند تغييرها في الجدول
-document.addEventListener('input', function(e){
-  if(e.target.classList.contains('qtyInput')){
-    const index = e.target.getAttribute('data-index');
-    let newQty = parseInt(e.target.value);
-    if (isNaN(newQty) || newQty < 1) newQty = 1;
-
-    const cart = getCart();
-    cart[index].quantity = newQty;
-    saveCart(cart);
-    displayCart();
-    updateCartButtonCount();
-  }
-});
-
-// حذف منتج من السلة
-document.addEventListener('click', function(e){
-  if(e.target.classList.contains('deleteBtn')){
-    const index = e.target.getAttribute('data-index');
-    const cart = getCart();
-    cart.splice(index, 1);
-    saveCart(cart);
-    displayCart();
-    updateCartButtonCount();
-  }
-});
-
-// تحديث عداد السلة في زر الصفحة الرئيسية
-function updateCartButtonCount() {
-  const cart = getCart();
-  let count = 0;
-  cart.forEach(item => count += item.quantity);
-  // نستخدم localStorage لتحديث العدد (يمكن تطوير حسب حاجتك)
-  localStorage.setItem('cartCount', count);
-}
-
-document.getElementById('orderForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const cart = getCart();
-  if (cart.length === 0) {
-    alert('السلة فارغة! الرجاء إضافة منتجات.');
-    return;
-  }
-
-  const formData = new FormData(this);
-
-  let orderSummary = 'تفاصيل الطلب:\n\n';
-  let total = 0;
-  cart.forEach(item => {
-    const itemTotal = item.price * item.quantity;
-    total += itemTotal;
-    orderSummary += `${item.name} × ${item.quantity} = ${itemTotal} د.ت\n`;
-  });
-  orderSummary += `\nالمجموع الكلي: ${total} د.ت\n\n`;
-  orderSummary += `الاسم: ${formData.get('name')}\nالهاتف: ${formData.get('phone')}\nالعنوان: ${formData.get('address')}\nطريقة الدفع: الدفع عند الاستلام`;
-
-  alert('تم إرسال الطلب بنجاح!\n\n' + orderSummary);
-
-  // بعد إرسال الطلب ننظف السلة
-  localStorage.removeItem('kawakiCart');
-  updateCartButtonCount();
-  this.reset();
-  displayCart();
-});
-
-// عرض السلة أول ما تحمل الصفحة
-displayCart();
-updateCartButtonCount();
-</script>
-
+  <header>
+    <h1>سلة المشتريات</h1>
+    <a href="index.html" class="top-btn">عودة إلى المنتجات</a>
+  </header>
+  <div id="cartContainer"></div>
+  <div class="customer-info">
+    <input type="text" id="name" placeholder="الاسم" required />
+    <input type="text" id="phone" placeholder="رقم الهاتف" required />
+    <input type="text" id="address" placeholder="العنوان" required />
+    <button onclick="submitOrder()">تأكيد الطلب</button>
+  </div>
+  <script src="confirm.js"></script>
 </body>
 </html>
